@@ -33,7 +33,7 @@ def generate_channel_data():
 root = tk.Tk()
 root.title("Orders Report Generator")
 
-root.geometry("500x200")
+root.geometry("600x200")
 
 pack_and_labour_charges = tk.Label(root, text="Pack & Labour Charges")
 pack_and_labour_charges.pack(padx=10, pady=10)

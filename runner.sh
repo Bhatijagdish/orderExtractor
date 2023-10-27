@@ -11,23 +11,35 @@ else
   brew install python
 fi
 
-
-if [[":$PATH:" != *":/usr/local/bin/:"*]]; then
+if [["$PATH" != *"/usr/local/bin"*]]; then
   echo "Adding Python directory to PATH"
-  echo 'export PATH="$PATH:/usr/local/bin"' >> "$SCRIPT_DIR/.bash_profile"
-  source "$SCRIPT_DIR/.bash_profile"
+  echo 'export PATH="$PATH:/usr/local/bin"' >> "$SCRIPT_PATH/.bash_profile"
+  source "$SCRIPT_PATH/.bash_profile"
 fi
 
 python_version=$(python3 --version 2>&1)
 echo "Python version: $python_version"
 
 if command -v python3 &>/dev/null; then
-  GUI_SCRIPT="$SCRIPT_DIR/orderExtractor/gui.py"
-  if [ -f "$GUI_SCRIPT" ]; then
+  GUI_SCRIPT="$SCRIPT_PATH/orderExtractor/"
+
+  if [ -d "$GUI_SCRIPT" ]; then
+
+    echo changing directory to project
+    cd "$GUI_SCRIPT"
+
+    sudo apt update -y 
+
+    sudo apt install python3-tk -y
+
+    echo installing dependencies
+    python3 -m pip install -r requirements.txt
+
     echo "Executing gui.py"
-    python3 "$GUI_SCRIPT"
+    python3 gui.py
+
   else
-    echo "gui.py not found"
+    echo "gui.py not found"   
   fi
 else
   echo "Python is not installed correctly. Can not run program"
