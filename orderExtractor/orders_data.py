@@ -17,31 +17,32 @@ class Orders(ReadFile):
         return self.get_column_data_by_header("Channel Name")
 
     def total_sales(self) -> List:
-        return self.get_column_data_by_header("Total")
+
+        return [float(item) for item in self.get_column_data_by_header("Total")]
 
     def order_statuses(self) -> List:
         return self.get_column_data_by_header("Order Status")
 
     def shipping_fee(self) -> List:
-        return self.get_column_data_by_header("Shipping Fee")
+        return [abs(float(item)) for item in self.get_column_data_by_header("Shipping Fee")]
 
     def service_tax(self) -> List:
-        return self.get_column_data_by_header("Service Tax")
+        return [abs(float(item)) for item in self.get_column_data_by_header("Service Tax")]
 
     def channel_fees(self) -> List:
-        return self.get_column_data_by_header("Total Channel Fees")
+        return [abs(float(item)) for item in self.get_column_data_by_header("Total Channel Fees")]
 
     def settlement_amounts(self) -> List:
-        return self.get_column_data_by_header("Settlement Amount")
+        return [float(item) for item in self.get_column_data_by_header("Settlement Amount")]
 
     def tax_rates(self) -> List:
-        return self.get_column_data_by_header("Tax Rate")
+        return [float(item) for item in self.get_column_data_by_header("Tax Rate")]
 
-    def return_dates(self) -> List:
-        return self.get_column_data_by_header("Return Date")
+    # def return_dates(self) -> List:
+    #     return [abs(item) for item in self.get_column_data_by_header("Return Date")]
 
     def quantities(self) -> List:
-        return self.get_column_data_by_header("Qty")
+        return [float(item) for item in self.get_column_data_by_header("Qty")]
 
     def get_month(self) -> str:
         date: str = self.input_sheet["A2"].value

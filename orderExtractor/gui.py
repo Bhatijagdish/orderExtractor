@@ -15,14 +15,14 @@ def get_static_product_cost() -> None:
 def get_labour_charges():
     try:
         value = enter_value.get() if str(enter_value.get()).isdigit() else 0
-        return int(value)
+        return float(value)
     except:
         messagebox.showerror("Invalid Value", "Pack & Labour Charges should be integer value")
 
 
 def generate_channel_data():
     pack_labour_charges = get_labour_charges()
-    if type(pack_labour_charges) != int:
+    if type(pack_labour_charges) != float:
         return None
 
     ad_expenses_checked = ad_checkbox.get()

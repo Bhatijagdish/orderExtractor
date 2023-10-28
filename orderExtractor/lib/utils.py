@@ -17,28 +17,28 @@ def create_sales_snapshot_dict(channelNames, totalSales, orderStatuses,
             data[channel_name] = [0] * 6
 
         currentValues = data[channel_name]
-        currentValues[0] = currentValues[0] + int(totalSales[i])
+        currentValues[0] = currentValues[0] + float(totalSales[i])
 
         if "cancel" in orderStatuses[i].lower() and "return" not in orderStatuses[i].lower():
-            currentValues[1] = currentValues[1] + int(totalSales[i])
+            currentValues[1] = currentValues[1] + float(totalSales[i])
 
-        if "return" in orderStatuses[i].lower() and int(shippingFees[i]) != 0:
-            currentValues[3] = currentValues[3] + int(totalSales[i])
+        if "return" in orderStatuses[i].lower() and float(shippingFees[i]) != 0:
+            currentValues[3] = currentValues[3] + float(totalSales[i])
 
-        if "return" in orderStatuses[i].lower() and int(shippingFees[i]) == 0:
-            currentValues[2] = currentValues[2] + int(totalSales[i])
+        if "return" in orderStatuses[i].lower() and float(shippingFees[i]) == 0:
+            currentValues[2] = currentValues[2] + float(totalSales[i])
 
         currentValues[1] = currentValues[1]
         currentValues[2] = currentValues[2]
         currentValues[3] = currentValues[3]
-        currentValues[4] = currentValues[4] + int(serviceTaxes[i]) + int(channelFees[i])
-        currentValues[5] = currentValues[5] + int(settlementAmounts[i])
+        currentValues[4] = currentValues[4] + float(serviceTaxes[i]) + float(channelFees[i])
+        currentValues[5] = currentValues[5] + float(settlementAmounts[i])
         data[channel_name] = currentValues
 
     for key, values in data.items():
         data[key] = [values[0], values[1], values[2], values[3],
                      (values[0] - values[1] - values[2] - values[3]),
-                     abs(values[4]), abs(values[5])]
+                     values[4], values[5]]
     data["Total"] = [sum(values) for values in zip(*data.values())]
 
     return data
@@ -59,7 +59,7 @@ def getTableCoordinates(table_name: str, sheet) -> str:
 
 def get_table_last_row(table_range: str):
     _, end = table_range.split(":")
-    last_row = int(''.join(filter(str.isdigit, end)))
+    last_row = float(''.join(filter(str.isdigit, end)))
     return last_row
 
 
@@ -127,8 +127,8 @@ def create_channel_dict(productSkuLists: List,
                         quantities: List,
                         channelFees: List,
                         product_cost_dict: dict,
-                        ad_expenses: int = 0,
-                        labour_charges: int = 0) -> dict:
+                        ad_expenses: float = 0,
+                        labour_charges: float = 0) -> dict:
     """
     trimChannelName is the string of selected channel "Amazon, Flipkart etc"
     labour charges can be an amount that is Optional
@@ -147,20 +147,20 @@ def create_channel_dict(productSkuLists: List,
             currentValues = data[sku_name]
 
             if "delivered" in orderStatuses[i].lower():
-                currentValues[10] = currentValues[10] + int(totalSales[i])
+                currentValues[10] = currentValues[10] + float(totalSales[i])
 
             if "cancel" in orderStatuses[i].lower() and "return" not in orderStatuses[i].lower():
-                currentValues[3] = currentValues[3] + int(quantities[i])
+                currentValues[3] = currentValues[3] + float(quantities[i])
 
-            if "return" in orderStatuses[i].lower() and int(shippingFees[i]) == 0:
-                currentValues[5] = currentValues[5] + int(quantities[i])
+            if "return" in orderStatuses[i].lower() and float(shippingFees[i]) == 0:
+                currentValues[5] = currentValues[5] + float(quantities[i])
 
-            if "return" in orderStatuses[i].lower() and int(shippingFees[i]) != 0:
-                currentValues[6] = currentValues[6] + int(quantities[i])
+            if "return" in orderStatuses[i].lower() and float(shippingFees[i]) != 0:
+                currentValues[6] = currentValues[6] + float(quantities[i])
 
             currentValues[0] = taxRates[i]
             currentValues[1] = currentValues[1] + 1
-            currentValues[2] = currentValues[2] + int(quantities[i])
+            currentValues[2] = currentValues[2] + float(quantities[i])
             currentValues[3] = currentValues[3]
             # currentValues[4] = round(currentValues[3] / currentValues[2] * 100, 2)
             currentValues[5] = currentValues[5]
@@ -168,7 +168,7 @@ def create_channel_dict(productSkuLists: List,
             # currentValues[7] = round((currentValues[5] + currentValues[6]) / currentValues[2] * 100, 2)
             # currentValues[8] = currentValues[2] - currentValues[3] - currentValues[5] - currentValues[6]
             currentValues[10] = currentValues[10]
-            currentValues[11] = currentValues[11] + int(serviceTaxes[i]) + int(channelFees[i])
+            currentValues[11] = currentValues[11] + float(serviceTaxes[i]) + float(channelFees[i])
 
             data[sku_name] = currentValues
 
@@ -184,20 +184,20 @@ def create_channel_dict(productSkuLists: List,
         fulfilled_pcs = values[2] - values[3] - values[5] - values[6]
         gross_amount = values[10] - values[11]
         tcs_tds = round((values[10] - values[11]) * 2 / 100, 2)
-        gst_amt = round(values[2] - (values[2] / (100 + values[0]) * 100), 2)
+        gst_amt = round(values[10] - (values[10] / (100 + values[0]) * 100), 2)
 
         # input for labour_charges
         labour_charge = values[1] * labour_charges
         gross_amount_nxt = round(gross_amount - tcs_tds - gst_amt - labour_charge, 2)
-        gst_tcs_tds = round(values[11] - values[11] / (100 + 18) * 100 + tcs_tds, 2)
-        product_gst_input = round(product_cost - values[0] / (100 + 18) * 100, 2) * fulfilled_pcs
+        gst_tcs_tds = round(values[11] - values[11] / (100 + values[0]) * 100 + tcs_tds, 2)
+        product_gst_input = round(product_cost - product_cost / (100 + values[0]) * 100, 2) * fulfilled_pcs
 
         amt_realised = gross_amount_nxt + gst_tcs_tds + product_gst_input
         ad_expense = round(values[1] / total_orders * ad_expenses, 2)
         net_realised_amount = amt_realised - ad_expense
         per_piece = round(net_realised_amount / fulfilled_pcs, 2) if total_return_ratio != 100 else 0
         net_profit_per_piece = round(per_piece - product_cost, 2)
-        total_net_profit = round((- abs(values[11]) - labour_charge - ad_expense if total_return_ratio == 100
+        total_net_profit = round((- values[11] - labour_charge - ad_expense if total_return_ratio == 100
                                   else net_profit_per_piece * fulfilled_pcs), 2)
         average_selling_price = round(values[10] / fulfilled_pcs, 2) if total_return_ratio != 100 else 0
 
@@ -207,13 +207,13 @@ def create_channel_dict(productSkuLists: List,
         new_value[7] = return_ratio
         new_value[8] = total_return_ratio
         new_value[9] = fulfilled_pcs
-        new_value[11] = abs(new_value[11])
+        new_value[11] = new_value[11]
         new_value[12] = gross_amount
         new_value[13] = tcs_tds
         new_value[14] = gst_amt
         new_value[15] = labour_charge
         new_value[16] = gross_amount_nxt
-        new_value[17] = abs(gst_tcs_tds)
+        new_value[17] = gst_tcs_tds
         new_value[18] = product_gst_input
         new_value[19] = amt_realised
         new_value[20] = ad_expense
@@ -250,7 +250,7 @@ def create_channel_dict(productSkuLists: List,
     return data
 
 
-def get_ad_expenses_value(workbook, channel_names: List):
+def get_ad_expenses_value(workbook, channel_names: List) -> dict:
     # last row that contains channel data considering starting from the row 1 as headers
     last_row = len(channel_names) + 1
 

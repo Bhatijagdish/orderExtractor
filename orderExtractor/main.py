@@ -66,7 +66,7 @@ def static_product_cost():
     return data
 
 
-def channel_sheet_creation(product_cost_dict: dict, ad_expenses_checked: bool, labour_charges: int = 0):
+def channel_sheet_creation(product_cost_dict: dict, ad_expenses_checked: bool, labour_charges: float = 0):
     file_path: str = select_file()
     data = Orders(file_path)
     try:
@@ -76,7 +76,7 @@ def channel_sheet_creation(product_cost_dict: dict, ad_expenses_checked: bool, l
             ad_expenses_dict = get_ad_expenses_value(data.workbook, channels)
         for channel in channels:
             if ad_expenses_checked:
-                ad_expenses = ad_expenses_dict[channel]
+                ad_expenses = float(ad_expenses_dict[channel])
             else:
                 ad_expenses = 0
             data.create_new_sheet(channel)
